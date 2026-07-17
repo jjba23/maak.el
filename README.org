@@ -1,0 +1,100 @@
+#+title: maak.el — Maak Task Runner Integration for Emacs
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+
+[[https://jointhefreeworld.org/ggg/dist/emacs-lisp.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/license-gpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
+
+~maak.el~ brings seamless integration for [[https://codeberg.org/jjba23/maak][Maak]] into your Emacs workflow. Maak replaces archaic Makefiles with the elegance and power of GNU Guile Scheme. With ~maak.el~, you can discover, inspect, and execute your Maak tasks directly from the comfort of Emacs, complete with rich minibuffer completions.
+
+- Automatic Project Discovery: Automatically locates your root ~maak.scm~ file using dominating-file heuristics.
+- Smart Visibility Parsing: Respects your Maak configuration's ~#:export~ lists—only showing public tasks (or all, if no exports).
+- Polished Completion UI: Implements aligned columns in your preferred completion framework (Vertico, Ivy, Helm, or native ~completing-read~) showcasing task signatures and docstrings.
+- Interactive Argument Gathering: If a task expects parameters, ~maak.el~ will sequentially prompt you for them in the minibuffer before executing.
+- Native Compilation Buffers: Executes tasks asynchronously via Emacs's native ~compile~ system, keeping shell-escaping watertight and allowing you to jump straight to errors.
+
+[[https://jointhefreeworld.org/static-assets/maak/maak-in-emacs.png]]
+
+--------
+
+* Installing
+
+This package is not (yet) available in popular Emacs repositories such as MELPA or ELPA.
+An example installation with Elpaca:
+#+begin_src emacs-lisp
+  (use-package maak.el
+    :ensure (:host codeberg :repo "jjba23/maak.el" :branch "trunk")
+    :demand t
+    :bind ("C-c m r" . maak-run-task))
+  #+end_src
+
+--------
+
+* Usage
+
+ Running Tasks
+
+Invoke the primary command:
+#+begin_key
+M-x maak-run-task
+#+end_key
+
+- Emacs will search upwards from your current buffer to find a ~maak.scm~.
+- A completion menu will pop up listing all exported tasks from your Scheme configuration.
+- If the task you select defines parameters (e.g., ~(define (deploy server env) ...)~), the minibuffer will prompt you sequentially.
+- A standard ~*compilation*~ buffer will spawn executing your task via ~maak  <args...>~.
+
+Using standard Emacs properties, your tasks are dynamically formatted in completion list. It will render beautifully aligned columns matching your theme's default font lock faces.
+
+--------
+
+* Customization
+
+You can customize ~maak.el~ behavior and looks with Emacs Lisp config (or via ~M-x customize-group RET maak RET~ ). Some worthy mentions:
+
+| Variable / Face              | Default Value                                  | Description                                                                                 |
+|------------------------------+------------------------------------------------+---------------------------------------------------------------------------------------------|
+| ~maak-annotation-padding~      | ~4~                                              | Number of spaces to maintain between the arguments and the docstring in completion columns. |
+| ~maak-task-arguments-face~     | Inherits ~font-lock-variable-name-face~ (italic) | Face used to render the task arguments list in completion.                                  |
+| ~maak-task-documentation-face~ | Inherits ~font-lock-doc-face~                    | Face used to render the task docstring in completion.                                       |
+
+Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseable,  ~maak.el~ parses ~maak.scm~ locally and cleanly, while being aware of S-exps, comments, etc.
+
+- It spins up a temporary buffer inside standard Emacs Lisp mode to parse Scheme forms safely.
+- It locates the module's ~#:export~ form (handling comments and strings seamlessly) to build a whitelist.
+- It maps defined procedures matching public exports (or all, if no exports), extracting Scheme docstrings and formal parameter lists.
+
+-----------
+
+* Licensing
+Maak and all of its source code are free software, licensed under the GNU General Public License v3 (or newer at your convenience).
+
+https://www.gnu.org/licenses/gpl-3.0.html
+
+The documentation and examples, including this document, which are provided with Maak, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
+
+https://www.gnu.org/licenses/fdl-1.3.html
+
+---------
+
+* AI Policy
+
+This project adheres to the [[https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-ai-policy/index.html][jointhefreeworld AI (Artificial Intelligence) policy]].
+
+Our core principle is simple: *AI should assist human creativity and problem-solving, never replace human reasoning.*
+
+While tools like Large Language Models (LLMs) and interactive chatbots can be beneficial for reviewing, refactoring small functions, or acting as a sounding board, they should be used with moderation.
+
+We require a human in the loop for all contributions. The use of autonomous AI agents to automatically generate and submit pull requests to this project is strictly prohibited.
+
+
+---------------------
+
+* Code of conduct
+This project adheres to the jointhefreeworld code of conduct. Find it here:
+
+https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-conduct/index.html
+
+In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
+
+--------
