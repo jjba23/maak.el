@@ -1,4 +1,4 @@
-#+title: maak.el — Maak Task Runner Integration for Emacs
+#+title: maak.el — Maak integration for Emacs
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
 #+language: en
