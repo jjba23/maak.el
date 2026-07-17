@@ -5,7 +5,7 @@
 
 [[https://jointhefreeworld.org/ggg/dist/emacs-lisp.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/license-gpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
 
-~maak.el~ brings seamless integration for [[https://codeberg.org/jjba23/maak][Maak]] into your Emacs workflow. Maak replaces archaic Makefiles with the elegance and power of GNU Guile Scheme. With ~maak.el~, you can discover, inspect, and execute your Maak tasks directly from the comfort of Emacs, complete with rich minibuffer completions.
+~maak.el~ brings seamless integration for [[https://codeberg.org/jjba23/maak][Maak: The infinitely extensible command runner, control plane and project automator à la Make (Guile Scheme - Lisp)]] into your Emacs workflow. Maak replaces archaic Makefiles with the elegance and power of GNU Guile Scheme. With ~maak.el~, you can discover, inspect, and execute your Maak tasks directly from the comfort of Emacs, complete with rich minibuffer completions.
 
 - Automatic Project Discovery: Automatically locates your root ~maak.scm~ file using dominating-file heuristics.
 - Smart Visibility Parsing: Respects your Maak configuration's ~#:export~ lists—only showing public tasks (or all, if no exports).
