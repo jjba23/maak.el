@@ -7,6 +7,12 @@
 
 ~maak.el~ brings seamless integration for [[https://codeberg.org/jjba23/maak][Maak: The infinitely extensible command runner, control plane and project automator à la Make (Guile Scheme - Lisp)]] into your Emacs workflow. Maak replaces archaic Makefiles with the elegance and power of GNU Guile Scheme. With ~maak.el~, you can discover, inspect, and execute your Maak tasks directly from the comfort of Emacs, complete with rich minibuffer completions.
 
+#+begin_quote
+Most build tools invent their own limited domain-specific language.  Maak embraces the powerful *λ Lisp* and the amazing Guile Scheme programming language.
+
+/This also means your code is flexible, robust and reliable (+declarative) for at least the next 50 years./
+#+end_quote
+
 - Automatic Project Discovery: Automatically locates your root ~maak.scm~ file using dominating-file heuristics.
 - Smart Visibility Parsing: Respects your Maak configuration's ~#:export~ lists—only showing public tasks (or all, if no exports).
 - Polished Completion UI: Implements aligned columns in your preferred completion framework (Vertico, Ivy, Helm, or native ~completing-read~) showcasing task signatures and docstrings.
@@ -14,6 +20,18 @@
 - Native Compilation Buffers: Executes tasks asynchronously via Emacs's native ~compile~ system, keeping shell-escaping watertight and allowing you to jump straight to errors.
 
 [[https://jointhefreeworld.org/static-assets/maak/maak-in-emacs.png]]
+
+#+begin_src
+ ,---.       ,---.
+(     \     /     )
+ )  (  \____/  )  (
+(    \ @  @ /    )      [ Maak ]
+ )    ( oo )    (       The infinitely extensible
+(      \__/      )      command runner, control plane,
+  `------------'        and project automator.
+#+end_src
+
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
 --------
 
