@@ -43,6 +43,18 @@ If you like my work, please support me by [[https://bmc.link/jjbigorra][buying m
 
 --------
 
+* Community & Support
+
+Join the ~maak~ community to ask questions, discuss development, share configurations, screenshots, report issues, or just hang out:
+
+Issues & development: [[https://codeberg.org/jjba23/maak.el][Codeberg repository]]
+
+Chat, support, discussion, announcements (Zulip): [[https://jointhefreeworld.zulipchat.com/#narrow/channel/632494-maak][Join the maak Zulip community]]
+
+If you're unsure where to start, Zulip is recommended. Codeberg issues is also a good place to add ideas, report bugs or improvements.
+
+------
+
 * Installing
 
 This package is not (yet) available in popular Emacs repositories such as MELPA or ELPA.
