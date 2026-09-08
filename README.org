@@ -39,9 +39,7 @@ Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseab
   `------------'        and project automator.
 #+end_src
 
-If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation
-
-.
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
 --------
 
