@@ -21,6 +21,14 @@ Most build tools invent their own limited domain-specific language.  Maak embrac
 
 [[https://jointhefreeworld.org/static-assets/maak/maak-in-emacs.png]]
 
+Using standard Emacs properties, your tasks are dynamically formatted in completion list. It will render beautifully aligned columns matching your theme's default font lock faces.
+
+Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseable,  ~maak.el~ parses ~maak.scm~ locally and cleanly, while being aware of S-exps, comments, etc.
+
+- It spins up a temporary buffer inside standard Emacs Lisp mode to parse Scheme forms safely.
+- It locates the module's ~#:export~ form (handling comments and strings seamlessly) to build a whitelist.
+- It maps defined procedures matching public exports (or all, if no exports), extracting Scheme docstrings and formal parameter lists.
+
 #+begin_src
  ,---.       ,---.
 (     \     /     )
@@ -31,7 +39,9 @@ Most build tools invent their own limited domain-specific language.  Maak embrac
   `------------'        and project automator.
 #+end_src
 
-If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation
+
+.
 
 --------
 
