@@ -15,6 +15,14 @@
 
 [[https://jointhefreeworld.org/static-assets/maak/maak-in-emacs.png]]
 
+Using standard Emacs properties, your tasks are dynamically formatted in completion list. It will render beautifully aligned columns matching your theme's default font lock faces.
+
+Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseable,  ~maak.el~ parses ~maak.scm~ locally and cleanly, while being aware of S-exps, comments, etc.
+
+- It spins up a temporary buffer inside standard Emacs Lisp mode to parse Scheme forms safely.
+- It locates the module's ~#:export~ form (handling comments and strings seamlessly) to build a whitelist.
+- It maps defined procedures matching public exports (or all, if no exports), extracting Scheme docstrings and formal parameter lists.
+
 --------
 
 * Installing
@@ -32,9 +40,7 @@ An example installation with Elpaca:
 
 * Usage
 
- Running Tasks
-
-Invoke the primary command:
+For running tasks in Emacs, simply invoke the primary command:
 #+begin_key
 M-x maak-run-task
 #+end_key
@@ -44,7 +50,6 @@ M-x maak-run-task
 - If the task you select defines parameters (e.g., ~(define (deploy server env) ...)~), the minibuffer will prompt you sequentially.
 - A standard ~*compilation*~ buffer will spawn executing your task via ~maak  <args...>~.
 
-Using standard Emacs properties, your tasks are dynamically formatted in completion list. It will render beautifully aligned columns matching your theme's default font lock faces.
 
 --------
 
@@ -58,11 +63,6 @@ You can customize ~maak.el~ behavior and looks with Emacs Lisp config (or via ~M
 | ~maak-task-arguments-face~     | Inherits ~font-lock-variable-name-face~ (italic) | Face used to render the task arguments list in completion.                                  |
 | ~maak-task-documentation-face~ | Inherits ~font-lock-doc-face~                    | Face used to render the task docstring in completion.                                       |
 
-Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseable,  ~maak.el~ parses ~maak.scm~ locally and cleanly, while being aware of S-exps, comments, etc.
-
-- It spins up a temporary buffer inside standard Emacs Lisp mode to parse Scheme forms safely.
-- It locates the module's ~#:export~ form (handling comments and strings seamlessly) to build a whitelist.
-- It maps defined procedures matching public exports (or all, if no exports), extracting Scheme docstrings and formal parameter lists.
 
 -----------
 
