@@ -16,7 +16,7 @@ Most build tools invent their own limited domain-specific language.  Maak embrac
 - Automatic Project Discovery: Automatically locates your root ~maak.scm~ file using dominating-file heuristics.
 - Smart Visibility Parsing: Respects your Maak configuration's ~#:export~ lists—only showing public tasks (or all, if no exports).
 - Polished Completion UI: Implements aligned columns in your preferred completion framework (Vertico, Ivy, Helm, or native ~completing-read~) showcasing task signatures and docstrings.
-- Interactive Argument Gathering: If a task expects parameters, ~maak.el~ will sequentially prompt you for them in the minibuffer before executing.
+- Interactive Argument Gathering: If a task expects parameters, ~maak.el~ will sequentially prompt you for them in the minibuffer before executing, understanding Guile's full lambda list (required, ~#:optional~, ~#:key~, ~#:rest~ and dotted rest arguments).
 - Native Compilation Buffers: Executes tasks asynchronously via Emacs's native ~compile~ system, keeping shell-escaping watertight and allowing you to jump straight to errors.
 
 [[https://jointhefreeworld.org/static-assets/maak/maak-in-emacs.png]]
@@ -80,19 +80,51 @@ M-x maak-run-task
 - Emacs will search upwards from your current buffer to find a ~maak.scm~.
 - A completion menu will pop up listing all exported tasks from your Scheme configuration.
 - If the task you select defines parameters (e.g., ~(define (deploy server env) ...)~), the minibuffer will prompt you sequentially.
+- Optional arguments can be left out by answering with an empty line; they are then not passed at all, so the task's own default applies.
 - A standard ~*compilation*~ buffer will spawn executing your task via ~maak  <args...>~.
 
 Using standard Emacs properties, your tasks are dynamically formatted in completion list. It will render beautifully aligned columns matching your theme's default font lock faces.
 
 --------
 
+* Task arguments
+
+~maak.el~ reads the argument list of a task the way Guile and maak do, so the prompts and the command line agree with what the task will receive.
+
+| Form in the Maak file                                  | What ~maak.el~ does                                                               |
+|--------------------------------------------------------+-----------------------------------------------------------------------------------|
+| ~(define (deploy target) ...)~                         | Prompts for ~target~. A blank answer is an error, before anything runs.           |
+| ~(define* (deploy target #:optional env) ...)~         | Prompts for ~env~ too; a blank answer leaves it out of the command.               |
+| ~(define* (deploy target #:optional (env "dev")) ...)~ | Shows the default; a blank answer lets the task use it.                           |
+| ~(define* (deploy #:key (env "dev")) ...)~             | Shows ~#:env=dev~ in completion; never prompts, because maak passes only strings. |
+| ~(define (echo . words) ...)~ or ~#:rest words~        | Prompts once for space separated words; a blank answer passes none.               |
+
+An optional argument answered with ~RET~ is *omitted*, never passed as the empty string ~""~ -- that is what makes the default on the task's side work. Leaving out an optional argument also leaves out the arguments after it, because maak binds positional words in order: there is no way to give the third optional argument a value while the second one is empty.
+
+Keyword arguments are displayed with their defaults but are not prompted for. A maak command line passes positional strings, and a string is not a keyword, so a keyword argument always arrives as its default; ~maak kw hello~ is an error, not a way to set a keyword. A keyword argument written without a default cannot be supplied at all, so ~maak.el~ says so before running rather than letting Guile fail with ~Missing keyword~.
+
+#+begin_src scheme
+(define* (deploy target #:optional (env "staging"))
+  "Deploy TARGET to ENV."
+  ...)
+#+end_src
+
+Choosing ~deploy~ and answering ~prod~ then ~RET~ runs:
+
+#+begin_src shell
+maak deploy prod
+#+end_src
+
+so the task sees ~env = "staging"~, rather than the empty string. An argument that begins with a dash is set apart with ~--~, as in ~maak quick-math -- -23 42~, and every word is shell quoted separately, so spaces and quotes in an argument survive.
+
 * Customization
 
 You can customize ~maak.el~ behavior and looks with Emacs Lisp config (or via ~M-x customize-group RET maak RET~ ). Some worthy mentions:
 
-| Variable / Face              | Default Value                                  | Description                                                                                 |
-|------------------------------+------------------------------------------------+---------------------------------------------------------------------------------------------|
+| Variable / Face                | Default Value                                    | Description                                                                                 |
+|--------------------------------+--------------------------------------------------+---------------------------------------------------------------------------------------------|
 | ~maak-annotation-padding~      | ~4~                                              | Number of spaces to maintain between the arguments and the docstring in completion columns. |
+| ~maak-executable~              | ~"maak"~                                         | Name of, or path to, the maak executable that tasks run.                                    |
 | ~maak-task-arguments-face~     | Inherits ~font-lock-variable-name-face~ (italic) | Face used to render the task arguments list in completion.                                  |
 | ~maak-task-documentation-face~ | Inherits ~font-lock-doc-face~                    | Face used to render the task docstring in completion.                                       |
 
@@ -103,6 +135,27 @@ Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseab
 - It maps defined procedures matching public exports (or all, if no exports), extracting Scheme docstrings and formal parameter lists.
 
 -----------
+
+* Development
+
+The project's own ~maak.scm~ defines the checks:
+
+#+begin_src shell
+maak test               # the ERT suite
+maak test optional      # only the tests whose names match "optional"
+maak byte-compile       # byte-compile maak.el with warnings as errors
+maak ci                 # both
+#+end_src
+
+Or run the suite directly:
+
+#+begin_src shell
+emacs -Q --batch -L . -l test/maak-test.el -f ert-run-tests-batch-and-exit
+#+end_src
+
+The fixtures under ~test/fixtures~ cover every argument form. Two tests check the parser against the reference implementation: one asks Guile for the arity of each fixture task, and one asks ~maak --list~ for the task list, so a change in the grammar shows up as a failing test rather than as a stale assumption.
+
+From Lisp, ~maak-get-tasks~ returns one ~(TASK-NAME DOCSTRING ARGUMENTS)~ entry per task, and each argument is a plist with ~:name~, ~:kind~ (~required~, ~optional~, ~key~ or ~rest~) and, when it has one, ~:default~ and ~:default-p~. A keyword argument also carries ~:keyword~.
 
 * Licensing
 Maak and all of its source code are free software, licensed under the GNU General Public License v3 (or newer at your convenience).
