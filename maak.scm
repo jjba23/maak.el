@@ -21,6 +21,10 @@
 (define-module (maak)
   #:declarative? #t
   #:use-module (maak maak)
+  ;; The container helpers are imported under a prefix because the exported
+  ;; tasks below are named the way maak exposes them on the command line --
+  ;; `maak container-build' -- and a task may not shadow the helper it calls.
+  #:use-module ((maak container) #:prefix ct:)
   #:export (default test byte-compile ci container-build container-run package-docker))
 
 ;; A value definition, not a task: maak.el's parser has to leave it out too.
@@ -60,11 +64,13 @@ With PATTERN, run only the tests whose names match it."
 
 (define (container-build)
   "Build the container image for maak-el."
-  ($ '("podman build -t maak-el .")))
+  (ct:container-build "." #:tag "maak-el" #:verbose? #t))
 
 (define (container-run)
   "Run the container image for maak-el."
-  ($ '("podman run --rm -it maak-el:latest")))
+  (ct:container-run "maak-el:latest"
+                    #:interactive? #t
+                    #:tty? #t))
 
 (define (package-docker)
   "Build the container image for maak-el."

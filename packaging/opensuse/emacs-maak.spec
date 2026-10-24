@@ -16,7 +16,7 @@
 #
 
 Name:           emacs-maak
-Version:        0.9.2
+Version:        0.9.3
 Release:        0
 Summary:        Maak integration for Emacs
 License:        GPL-3.0-or-later
