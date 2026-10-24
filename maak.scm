@@ -21,7 +21,7 @@
 (define-module (maak)
   #:declarative? #t
   #:use-module (maak maak)
-  #:export (default test byte-compile ci))
+  #:export (default test byte-compile ci container-build container-run package-docker))
 
 ;; A value definition, not a task: maak.el's parser has to leave it out too.
 (define emacs-batch-command
@@ -55,3 +55,17 @@ With PATTERN, run only the tests whose names match it."
   "Byte-compile and test, the way continuous integration does."
   (byte-compile)
   (test))
+
+;; ====== Container tasks ======
+
+(define (container-build)
+  "Build the container image for maak-el."
+  ($ '("podman build -t maak-el .")))
+
+(define (container-run)
+  "Run the container image for maak-el."
+  ($ '("podman run --rm -it maak-el:latest")))
+
+(define (package-docker)
+  "Build the container image for maak-el."
+  (container-build))
