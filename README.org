@@ -4,6 +4,9 @@
 #+language: en
 #+options: toc:nil
 
+#+attr_html: :width 100% :alt maak.el — Maak tasks in your Emacs minibuffer
+[[file:resources/maak-banner.svg]]
+
 [[https://jointhefreeworld.org/ggg/dist/emacs-lisp.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/license-gpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
 
 ~maak.el~ brings seamless integration for [[https://codeberg.org/jjba23/maak][Maak: The infinitely extensible command runner, control plane and project automator à la Make (Guile Scheme - Lisp)]] into your Emacs workflow. Maak replaces archaic Makefiles with the elegance and power of GNU Guile Scheme. With ~maak.el~, you can discover, inspect, and execute your Maak tasks directly from the comfort of Emacs, complete with rich minibuffer completions.
@@ -270,6 +273,21 @@ https://www.gnu.org/licenses/gpl-3.0.html
 The documentation and examples, including this document, which are provided with Maak, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
 
 https://www.gnu.org/licenses/fdl-1.3.html
+
+---------
+
+* Colophon
+:PROPERTIES:
+:CUSTOM_ID: colophon
+:END:
+
+- The mascot is the *maak* skeu icon — a skeuomorphic document holding the Guile lambda — and it is the same icon the [[https://codeberg.org/jjba23/maak][maak]] command runner wears, so the two projects read as one family. A copy lives beside the banner:
+
+  #+attr_html: :width 200px :alt the maak skeu icon
+  [[file:resources/maak-icon.png]]
+- The banner at the top of this file is hand-written SVG, living in [[file:resources/maak-banner.svg][resources/maak-banner.svg]] — the mascot is embedded in it, so there are no external assets and no font downloads, and it renders anywhere the file goes. It is laid out like maak's own banner, so the two READMEs look like siblings.
+- The badges come from the [[https://jointhefreeworld.org/][jointhefreeworld]] glyph generator.
+- The text-mode logo above is the one maak prints, for terminals and plain-text readers.
 
 ---------
 
