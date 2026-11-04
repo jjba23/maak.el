@@ -4,10 +4,10 @@
 #+language: en
 #+options: toc:nil
 
-#+attr_html: :width 100% :alt maak.el — Maak tasks in your Emacs minibuffer
-[[file:resources/maak-banner.svg]]
-
 [[https://jointhefreeworld.org/ggg/dist/emacs-lisp.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/license-gpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
+
+#+attr_html: :width 160 :alt maak.el logo
+[[file:logo.svg]]
 
 ~maak.el~ brings seamless integration for [[https://codeberg.org/jjba23/maak][Maak: The infinitely extensible command runner, control plane and project automator à la Make (Guile Scheme - Lisp)]] into your Emacs workflow. Maak replaces archaic Makefiles with the elegance and power of GNU Guile Scheme. With ~maak.el~, you can discover, inspect, and execute your Maak tasks directly from the comfort of Emacs, complete with rich minibuffer completions.
 
@@ -135,7 +135,6 @@ Each recipe carries its own dependency list, so a missing library fails the buil
 - *Nix* if the rest of your machine is already declarative; the flake pins nixpkgs and gives you a binary cache.
 - *Container* if you only want to try the release, or reproduce a report on a machine that has nothing installed.
 - *Distribution package* if you want the project managed by the same tool as the rest of your system, with its licence, manual page and launcher in the usual places.
-
 
 * Installing
 :PROPERTIES:
@@ -281,11 +280,11 @@ https://www.gnu.org/licenses/fdl-1.3.html
 :CUSTOM_ID: colophon
 :END:
 
-- The mascot is the *maak* skeu icon — a skeuomorphic document holding the Guile lambda — and it is the same icon the [[https://codeberg.org/jjba23/maak][maak]] command runner wears, so the two projects read as one family. A copy lives beside the banner:
+- The mascot is the *maak* skeu icon — a skeuomorphic document holding the Guile lambda — and it is the same icon the [[https://codeberg.org/jjba23/maak][maak]] command runner wears, so the two projects read as one family. A copy lives below:
 
   #+attr_html: :width 200px :alt the maak skeu icon
   [[file:resources/maak-icon.png]]
-- The banner at the top of this file is hand-written SVG, living in [[file:resources/maak-banner.svg][resources/maak-banner.svg]] — the mascot is embedded in it, so there are no external assets and no font downloads, and it renders anywhere the file goes. It is laid out like maak's own banner, so the two READMEs look like siblings.
+- The logo at the top of this file is the shared maak mark, ~logo.svg~: hand-written 64×64 vector paths, no external assets, no font downloads, so it renders anywhere the file goes. It is the same object maak wears, so the two READMEs read as one family.
 - The badges come from the [[https://jointhefreeworld.org/][jointhefreeworld]] glyph generator.
 - The text-mode logo above is the one maak prints, for terminals and plain-text readers.
 
@@ -303,7 +302,6 @@ Our core principle is simple: *AI should assist human creativity and problem-sol
 While tools like Large Language Models (LLMs) and interactive chatbots can be beneficial for reviewing, refactoring small functions, or acting as a sounding board, they should be used with moderation.
 
 We require a human in the loop for all contributions. The use of autonomous AI agents to automatically generate and submit pull requests to this project is strictly prohibited.
-
 
 ---------------------
 
