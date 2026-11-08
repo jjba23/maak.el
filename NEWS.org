@@ -10,6 +10,40 @@ removals.
 This project adheres loosely to [[https://semver.org/spec/v2.0.0.html][Semantic
 Versioning]].
 
+* 0.10.0 (2026-11-09)
+
+*** Added
+
+- ~M-x maak-describe-task~, the inspect half of what this package claims to do.
+  It shows a task's whole docstring, the command line it would run as, and one
+  line per argument with its kind and default — including the keyword argument
+  maak cannot pass at all.  The completion list has room for the first line of a
+  docstring beside the signature; this is where the rest goes.
+- ~M-x maak-goto-task~ opens the Maak file at the definition of the task you
+  pick, with the same completion list the run uses, and pushes where you were
+  onto the xref marker stack so ~xref-go-back~ returns.  A task you cannot
+  remember the shape of is now a task you can read.
+- A task entry carries its definition position, so ~maak-get-tasks~ returns
+  ~(TASK-NAME DOCSTRING ARGUMENTS POSITION)~.  The first three elements are what
+  they always were.
+
+*** Fixed
+
+- A ~maak~ that is not installed is refused before the run, with an error naming
+  ~maak-executable~.  It used to reach ~compile~ and come back as a compilation
+  buffer whose first line said ~Searching for program~, which reads like a build
+  failure rather than a missing tool.
+
+*** Changed
+
+- ~maak-read-task-entry~ is the task prompt on its own, so a command that wants
+  to act on a task rather than run it does not have to write the completion list
+  again.  ~maak-read-task~ is that plus the argument prompts.
+
+*** Version
+
+- Bumped the version to 0.10.0: new commands, and no change to how a task runs.
+
 * 0.9.4 (2026-11-09)
 
 *** Changed

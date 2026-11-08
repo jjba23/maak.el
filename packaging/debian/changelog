@@ -1,3 +1,10 @@
+elpa-maak (0.10.0-1) unstable; urgency=medium
+
+  * Add maak-describe-task and maak-goto-task.
+  * Refuse to run when the maak executable is missing.
+
+ -- Josep Bigorra <jjbigorra@gmail.com>  Mon, 09 Nov 2026 00:20:00 +0100
+
 elpa-maak (0.9.4-1) unstable; urgency=medium
 
   * Relicense to MIT, code and documentation alike.

@@ -16,7 +16,7 @@
 #
 
 Name:           emacs-maak
-Version:        0.9.4
+Version:        0.10.0
 Release:        0
 Summary:        Maak integration for Emacs
 License:        MIT
@@ -54,3 +54,6 @@ emacs -Q --batch -L . -L test -l test/maak-test.el -f ert-run-tests-batch-and-ex
 - Relicense to MIT, code and documentation alike.
 - Point the metadata at the project's GitHub home.
 - Split the README into a guide under docs/ and add release notes.
+* Mon Nov 09 2026 Josep Bigorra <jjbigorra@gmail.com> - 0.10.0-0
+- Add maak-describe-task and maak-goto-task.
+- Refuse to run when the maak executable is missing.
