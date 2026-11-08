@@ -17,7 +17,7 @@ continues.
 | Document                                        | What it covers                                                                            |
 |-------------------------------------------------+-------------------------------------------------------------------------------------------|
 | [[file:installing.org][Installing maak.el]]                    | The four routes to the same release, the requirements, and which one to pick.              |
-| [[file:using-maak-in-emacs.org][Running your tasks from Emacs]]         | ~M-x maak-run-task~: finding the file, the completion list, prompting and the compile buffer. |
+| [[file:using-maak-in-emacs.org][Running your tasks from Emacs]]         | ~maak-run-task~, ~maak-describe-task~ and ~maak-goto-task~: the file, the completion list, prompting and the compile buffer. |
 | [[file:task-arguments.org][Task arguments]]                       | Every lambda-list form, the defaults, the keyword caveat and the quoting.                  |
 | [[file:customization.org][Customization]]                       | The two variables and two faces, and what is meant to stay in your Maak file.              |
 | [[file:development.org][Development]]                         | The task list, the suite, the fixtures and the Lisp API behind the command.                |

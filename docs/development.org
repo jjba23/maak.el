@@ -78,13 +78,19 @@ does not curate its own surface.
 :CUSTOM_ID: the-lisp-api
 :END:
 
-The command is a thin layer over two functions, and they are what to reach for
-from your own Lisp:
+The commands are a thin layer over a handful of functions, and they are what to
+reach for from your own Lisp:
 
 - ~maak-find-file~ returns the nearest ~maak.scm~ above ~default-directory~, or
   nil.
-- ~maak-get-tasks~ takes a file and returns one ~(TASK-NAME DOCSTRING
-  ARGUMENTS)~ entry per task.
+- ~maak-get-tasks~ takes a file and returns one ~(TASK-NAME DOCSTRING ARGUMENTS
+  POSITION)~ entry per task.  ~POSITION~ is where the definition starts, which is
+  what ~maak-goto-task~ visits.
+- ~maak-task-description~ returns the text ~maak-describe-task~ shows, so a
+  docstring and an argument list can be rendered without a buffer.
+- ~maak-command~ returns the command line a task would run as, quoted.
+- ~maak-read-task-entry~ is the completion list on its own, for a command of
+  yours that wants to act on a task rather than run it.
 
 Each element of ~ARGUMENTS~ is a plist with ~:name~, ~:kind~ (one of ~required~,
 ~optional~, ~key~ or ~rest~) and, when it has one, ~:default~ and ~:default-p~.  A

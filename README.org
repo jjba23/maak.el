@@ -54,6 +54,11 @@ apart.
 - *Native compilation buffers*: tasks run asynchronously through Emacs' own
   ~compile~ system, with shell escaping kept watertight and ~next-error~ working
   on whatever the task prints.
+- *Inspection*: ~M-x maak-describe-task~ shows the whole docstring, the command
+  line and every argument with its kind and default — the part the completion
+  list has no room for.
+- *One key from the definition*: ~M-x maak-goto-task~ opens the Maak file at the
+  task you chose, because a build you cannot read is a build you cannot fix.
 
 * Getting started in one screen
 
@@ -84,7 +89,7 @@ these are the pages people start with:
 | Document                                        | What it covers                                                                            |
 |-------------------------------------------------+-------------------------------------------------------------------------------------------|
 | [[file:docs/installing.org][Installing maak.el]]                    | Guix, Nix, container, distribution package, Elpaca, and which one to pick.                 |
-| [[file:docs/using-maak-in-emacs.org][Running your tasks from Emacs]]         | ~M-x maak-run-task~: finding the file, the completion list, prompting, the compile buffer. |
+| [[file:docs/using-maak-in-emacs.org][Running your tasks from Emacs]]         | ~maak-run-task~, ~maak-describe-task~ and ~maak-goto-task~: the file, the completion list, prompting and the compile buffer. |
 | [[file:docs/task-arguments.org][Task arguments]]                       | Every lambda-list form, the defaults, the keyword caveat and the quoting.                  |
 | [[file:docs/customization.org][Customization]]                       | The two variables and two faces.                                                          |
 | [[file:docs/development.org][Development]]                         | The project's own tasks, the suite, the fixtures and the Lisp API.                         |

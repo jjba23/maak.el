@@ -8,10 +8,11 @@
 
 * Running your tasks from Emacs
 
-~M-x maak-run-task~ is the whole interface: it finds the project's Maak file,
-lists the tasks a run could name, asks for what the task needs, and runs it in
-Emacs' own compilation buffer.  What a task may ask for is the subject of
-[[file:task-arguments.org][Task arguments]]; this page is the run itself.
+~M-x maak-run-task~ runs a task, ~M-x maak-describe-task~ shows what one takes
+without running it, and ~M-x maak-goto-task~ opens the Maak file where it is
+written.  What a task may ask for is the subject of
+[[file:task-arguments.org][Task arguments]]; this page is the run itself, and the
+two commands beside it.
 
 ** Contents
 :PROPERTIES:
@@ -21,6 +22,8 @@ Emacs' own compilation buffer.  What a task may ask for is the subject of
 - [[#running-a-task][Running a task]]
 - [[#how-the-file-is-found][How the file is found]]
 - [[#what-the-completion-shows][What the completion shows]]
+- [[#inspecting-a-task][Inspecting a task]]
+- [[#jumping-to-the-definition][Jumping to the definition]]
 - [[#prompting][Prompting]]
 - [[#the-compilation-buffer][The compilation buffer]]
 - [[#what-it-does-not-do][What it does not do]]
@@ -76,6 +79,54 @@ and why an unbalanced file still yields the tasks read before the mistake instea
 of nothing at all.  Scheme and Emacs Lisp are mutually readable here, which is
 what lets an Emacs hold a conversation with a Guile project without spawning
 Guile for it.
+
+** Inspecting a task
+:PROPERTIES:
+:CUSTOM_ID: inspecting-a-task
+:END:
+
+The completion list has room for the first line of a docstring and the
+signature, which is enough to choose a task and not always enough to run one.
+~M-x maak-describe-task~ shows the rest in a ~*maak task: NAME*~ buffer:
+
+#+begin_src text
+deploy
+
+  Deploy TARGET to ENV, which is staging unless you say otherwise.
+
+Command: maak deploy target [env="staging"]
+
+Arguments:
+  target         required  a value is required
+  env            optional  default: "staging"
+#+end_src
+
+Three things are worth more there than in the menu.  The whole docstring is
+shown, not its first line.  Every argument is listed with its kind, so an
+argument that is never prompted for is visible as one.  And a keyword argument
+that maak cannot pass at all says so, instead of failing later inside Guile with
+~Missing keyword~: maak's command line only carries positional strings, so the
+default is all a keyword argument will ever get.
+
+** Jumping to the definition
+:PROPERTIES:
+:CUSTOM_ID: jumping-to-the-definition
+:END:
+
+#+begin_src text
+M-x maak-goto-task
+#+end_src
+
+opens the Maak file at the task's own ~define~, with the same completion list and
+the same annotations as the run, and pushes where you were onto the xref marker
+stack, so ~xref-go-back~ returns.  A task you cannot remember the shape of is a
+task you can read, and a build step that reads wrong is one edit away from being
+right — the two halves of "your build is Lisp" that an editor can actually
+deliver.
+
+That is what the recorded positions in [[file:development.org#the-lisp-api][the Lisp API]]
+are for: ~maak-get-tasks~ carries where each task is written, and these two
+commands are the ones that read it.
 
 ** Prompting
 :PROPERTIES:

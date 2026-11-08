@@ -522,6 +522,90 @@ message short enough to read."
             (should (equal (maak-find-file) file))))
       (delete-directory root t))))
 
+;;; Inspecting and visiting a task
+
+(ert-deftest maak-test-tasks-carry-their-definition ()
+  "A task carries the position of its definition, so a reader can visit it."
+  (let* ((file (maak-test-fixture "grammar.scm"))
+         (text (with-temp-buffer
+                 (insert-file-contents file)
+                 (buffer-string)))
+         (tasks (maak-get-tasks file)))
+    (dolist (name '("no-args" "lambda-task"))
+      (should (string-prefix-p "(define"
+                               (substring text (1- (nth 3 (assoc name tasks)))))))))
+
+(ert-deftest maak-test-description-names-the-task-command-and-arguments ()
+  "The description holds the name, the command line and every argument."
+  (let* ((tasks (maak-get-tasks (maak-test-fixture "grammar.scm")))
+         (text (maak-task-description (assoc "optional-defaults" tasks))))
+    (should (string-prefix-p "optional-defaults\n" text))
+    (should (string-match-p "Take a required argument and two optional" text))
+    (should (string-match-p
+             "Command: maak optional-defaults required \\[first=\"one\"\\] \\[second=\"two\"\\]"
+             text))
+    (should (string-match-p "default: \"one\"" text))
+    (should (string-match-p "default: \"two\"" text))))
+
+(ert-deftest maak-test-description-of-a-task-without-arguments ()
+  "A task that takes nothing says so rather than showing an empty table."
+  (let* ((tasks (maak-get-tasks (maak-test-fixture "grammar.scm")))
+         (text (maak-task-description (assoc "no-args" tasks))))
+    (should (string-match-p "Arguments: none" text))))
+
+(ert-deftest maak-test-description-of-a-keyword-argument ()
+  "A keyword argument is described with the keyword and its default."
+  (let* ((tasks (maak-get-tasks (maak-test-fixture "grammar.scm")))
+         (text (maak-task-description (assoc "mixed" tasks))))
+    (should (string-match-p "#:flag" text))
+    (should (string-match-p "default: \"f\"" text))))
+
+(ert-deftest maak-test-description-keeps-every-line-of-a-docstring ()
+  "The description shows the whole docstring, not only its first line."
+  (maak-test-with-project
+      "(define-module (maak) #:export (deploy))
+
+(define (deploy target)
+  \"Deploy TARGET.
+
+The second line, which the completion list has no room for.\"
+  target)"
+    (let ((text (maak-task-description
+                 (assoc "deploy" (maak-get-tasks maak-test-project-file)))))
+      (should (string-match-p "Deploy TARGET." text))
+      (should (string-match-p "The second line" text)))))
+
+(ert-deftest maak-test-describe-task-fills-a-buffer ()
+  "`maak-describe-task' returns the buffer that holds the description."
+  (maak-test-with-project
+      "(define-module (maak) #:export (build))
+
+(define (build) \"Build it.\" #t)"
+    (let* ((task (assoc "build" (maak-get-tasks maak-test-project-file)))
+           (buffer (maak-describe-task task)))
+      (unwind-protect
+          (with-current-buffer buffer
+            (should (string-match-p "Command: maak build" (buffer-string))))
+        (kill-buffer buffer)))))
+
+(ert-deftest maak-test-goto-task-visits-the-definition ()
+  "`maak-goto-task' opens the Maak file at the chosen task."
+  (maak-test-with-project
+      "(define-module (maak) #:export (build deploy))
+
+(define (build) \"Build.\" #t)
+
+(define (deploy target) \"Deploy.\" target)"
+    (let ((task (assoc "deploy" (maak-get-tasks maak-test-project-file))))
+      (unwind-protect
+          (progn
+            (maak-goto-task task)
+            (should (equal (file-truename (buffer-file-name))
+                           (file-truename maak-test-project-file)))
+            (should (looking-at-p "(define (deploy")))
+        (when (get-file-buffer maak-test-project-file)
+          (kill-buffer (get-file-buffer maak-test-project-file)))))))
+
 ;;; This project's own Maak file
 
 (ert-deftest maak-test-project-maak-file-is-wired ()

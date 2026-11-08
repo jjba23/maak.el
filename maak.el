@@ -2,7 +2,7 @@
 
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;; Version: 0.9.4
+;; Version: 0.10.0
 ;; Author: Josep Bigorra <jjbigorra@gmail.com>
 ;; Maintainer: Josep Bigorra <jjbigorra@gmail.com>
 ;; URL: https://github.com/jjba23/maak.el
@@ -54,6 +54,10 @@
 (require 'compile)
 (require 'seq)
 (require 'subr-x)
+;; `maak-goto-task' puts the point it came from on the marker stack, and
+;; `xref-push-marker-stack' is not autoloaded on every Emacs this package
+;; supports, so the library that holds it is loaded here.
+(require 'xref)
 
 (defgroup maak nil
   "Customizations for the maak task runner."
@@ -271,12 +275,13 @@ definition."
             (error nil)))))))
 
 (defun maak--parse-definition (start end)
-  "Return (NAME DOCSTRING ARGUMENTS) for the definition at START..END, or nil.
+  "Return (NAME DOCSTRING ARGUMENTS START) for the definition at START..END.
 
 Only a procedure definition is a task, spelled either as shorthand
 `(define (name arg ...) body)' -- or `define*' -- or as a value bound to a
 `lambda' or `lambda*' form.  A value definition, such as
-`(define build-dir \"build\")', defines no task and returns nil."
+`(define build-dir \"build\")', defines no task and returns nil.  START is
+carried along so a task can be visited where it is written."
   (let ((items (maak--list-items start end)))
     (when items
       (let* ((head (maak--item-text (car items)))
@@ -313,7 +318,8 @@ Only a procedure definition is a task, spelled either as shorthand
             (when (and name body-start)
               (list name
                     (or (maak--docstring-after body-start end) "")
-                    arguments))))))))
+                    arguments
+                    start))))))))
 
 (defun maak--export-clause (items)
   "Return the item that holds the export list in the module clauses ITEMS."
@@ -358,13 +364,14 @@ scanner its comments and strings."
       (expand-file-name "maak.scm" dir))))
 
 (defun maak-get-tasks (file)
-  "Extract task names, arguments, and docstrings from the given maak.scm FILE.
+  "Extract task names, arguments, docstrings and positions from the FILE.
 
-Returns a list of (TASK-NAME DOCSTRING ARGUMENTS), respecting the `#:export'
-visibility rules.  Only top-level procedure definitions are tasks: a helper
-defined inside a task body belongs to that body, and a value definition is not
-a procedure at all.  When a name is defined more than once, the last
-definition is the one maak binds."
+Returns a list of (TASK-NAME DOCSTRING ARGUMENTS POSITION), respecting the
+`#:export' visibility rules.  Only top-level procedure definitions are tasks:
+a helper defined inside a task body belongs to that body, and a value
+definition is not a procedure at all.  When a name is defined more than once,
+the last definition is the one maak binds.  POSITION is where the definition
+starts in FILE, which is what `maak-goto-task' visits."
   (with-temp-buffer
     (insert-file-contents file)
     (maak--scheme-mode)
@@ -408,6 +415,49 @@ after `=' because it is what the task sees when the argument is left out."
 (defun maak-task-signature (arguments)
   "Return the command-line signature of ARGUMENTS as one string."
   (string-join (mapcar #'maak-argument-display arguments) " "))
+
+(defun maak--argument-summary (argument)
+  "Return one line describing ARGUMENT, for `maak-task-description'."
+  (let ((name (plist-get argument :name))
+        (kind (plist-get argument :kind))
+        (default (plist-get argument :default))
+        (default-p (plist-get argument :default-p)))
+    (format "  %-14s %-9s %s"
+            (or (plist-get argument :keyword) name)
+            kind
+            (cond ((and (eq kind 'key) (not default-p))
+                   "maak cannot pass this one: give it a default")
+                  (default-p (format "default: %s" default))
+                  ((eq kind 'required) "a value is required")
+                  ((eq kind 'rest) "any number of words, space separated")
+                  (t "left out when the answer is blank")))))
+
+(defun maak-task-description (task)
+  "Return a plain-text description of TASK, an entry from `maak-get-tasks'.
+
+The name comes first, then the whole docstring, then the command line the task
+would run as and one line per argument.  The completion list has room for the
+first line of a docstring beside the signature; this is where the rest goes."
+  (let* ((name (nth 0 task))
+         (doc (nth 1 task))
+         (arguments (nth 2 task))
+         (command (string-trim (concat maak-executable " " name " "
+                                       (maak-task-signature arguments)))))
+    (concat
+     name "\n"
+     (when (and doc (not (string-empty-p doc)))
+       (concat "\n"
+               (mapconcat (lambda (line) (concat "  " line))
+                          (split-string doc "\n")
+                          "\n")
+               "\n"))
+     "\nCommand: " command "\n"
+     "\nArguments:"
+     (if (null arguments)
+         " none\n"
+       (concat "\n"
+               (mapconcat #'maak--argument-summary arguments "\n")
+               "\n")))))
 
 (defun maak-make-annotation-function (tasks)
   "Return an annotation function formatted dynamically for TASKS columns."
@@ -512,9 +562,12 @@ no way to supply it at all."
       (message "Leaving out the rest of the arguments of %s" task))
     (nreverse values)))
 
-(defun maak-read-task ()
-  "Prompt the user to select a task and dynamically input arguments.
-Returns a list of the format: (task-name (arg-value1 arg-value2 ...))"
+(defun maak-read-task-entry (&optional prompt)
+  "Read a task from the nearest maak.scm and return its `maak-get-tasks' entry.
+
+PROMPT defaults to \"maak task: \".  The completion list is annotated the way
+`maak-run-task' annotates it, so the name, the arguments and the first line of
+the docstring are what you choose from."
   (let ((file (maak-find-file)))
     (unless file
       (user-error "No maak.scm found in this directory or its parents"))
@@ -525,10 +578,55 @@ Returns a list of the format: (task-name (arg-value1 arg-value2 ...))"
                         (lambda (a b) (string< (car a) (car b)))))
       (let* ((completion-extra-properties
               `(:annotation-function ,(maak-make-annotation-function tasks)))
-             (task-name (completing-read "Run maak task: "
-                                         (mapcar #'car tasks) nil t))
-             (task (assoc task-name tasks)))
-        (list task-name (maak-read-arguments task-name (nth 2 task)))))))
+             (task-name (completing-read (or prompt "maak task: ")
+                                         (mapcar #'car tasks) nil t)))
+        (assoc task-name tasks)))))
+
+(defun maak-read-task ()
+  "Prompt the user to select a task and dynamically input arguments.
+Returns a list of the format: (task-name (arg-value1 arg-value2 ...))"
+  (let ((task (maak-read-task-entry "Run maak task: ")))
+    (list (nth 0 task)
+          (maak-read-arguments (nth 0 task) (nth 2 task)))))
+
+;;;###autoload
+(defun maak-describe-task (task)
+  "Describe TASK, an entry from `maak-get-tasks', in a help buffer.
+
+The description holds the name, the whole docstring, the command line the task
+would run as and one line per argument.  Returns the buffer, so a caller -- or
+a test -- can read what was shown."
+  (interactive (list (maak-read-task-entry "Describe maak task: ")))
+  (let ((buffer (get-buffer-create (format "*maak task: %s*" (car task)))))
+    (with-current-buffer buffer
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert (maak-task-description task))
+        (goto-char (point-min))
+        (help-mode)))
+    (display-buffer buffer)
+    buffer))
+
+;;;###autoload
+(defun maak-goto-task (task)
+  "Visit the definition of TASK, an entry from `maak-get-tasks'.
+
+The Maak file opens at the definition, and the previous position goes on the
+xref marker stack, so `xref-go-back' returns to it."
+  (interactive (list (maak-read-task-entry "Go to maak task: ")))
+  (let ((file (maak-find-file))
+        (position (nth 3 task)))
+    (unless file
+      (user-error "No maak.scm found in this directory or its parents"))
+    (unless position
+      (user-error "%s carries no position; read the file with `maak-get-tasks'"
+                  (nth 0 task)))
+    (xref-push-marker-stack)
+    (find-file file)
+    ;; The file may have been edited since it was read, so the recorded
+    ;; position is clamped rather than trusted to be inside the buffer.
+    (goto-char (min position (point-max)))
+    (recenter)))
 
 (defun maak-command (task arguments)
   "Return the command line that runs TASK with ARGUMENTS.
