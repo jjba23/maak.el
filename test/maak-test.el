@@ -532,7 +532,7 @@ message short enough to read."
   (let* ((file (expand-file-name "maak.scm" maak-test-root))
          (tasks (maak-get-tasks file)))
     (should (equal (mapcar #'car tasks)
-                   '("default" "test" "byte-compile" "ci"
+                   '("default" "test" "byte-compile" "ci" "agents"
                      "container-build" "container-run" "package-docker")))
     (dolist (name '("container-build" "container-run" "package-docker"))
       (should (equal (maak-test-arguments (assoc name tasks)) nil)))
