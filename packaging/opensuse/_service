@@ -1,7 +1,7 @@
 <services>
   <service name="obs_scm" mode="manual">
     <param name="scm">git</param>
-    <param name="url">https://codeberg.org/jjba23/maak.el.git</param>
+    <param name="url">https://github.com/jjba23/maak.el.git</param>
     <param name="revision">trunk</param>
     <param name="filename">maak.el</param>
     <param name="match-tag">v*</param>

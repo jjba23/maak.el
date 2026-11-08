@@ -19,8 +19,8 @@ Name:           emacs-maak
 Version:        0.9.3
 Release:        0
 Summary:        Maak integration for Emacs
-License:        GPL-3.0-or-later
-URL:            https://codeberg.org/jjba23/maak.el
+License:        MIT
+URL:            https://github.com/jjba23/maak.el
 Source0:        maak.el-%{version}.tar.gz
 BuildRequires:  emacs
 Requires:       emacs
@@ -44,7 +44,7 @@ install -m 0644 maak.el maak.elc %{buildroot}%{_datadir}/emacs/site-lisp/
 emacs -Q --batch -L . -L test -l test/maak-test.el -f ert-run-tests-batch-and-exit
 
 %files
-%license COPYING
+%license LICENSE
 %doc README.org
 %{_datadir}/emacs/site-lisp/maak.el
 %{_datadir}/emacs/site-lisp/maak.elc

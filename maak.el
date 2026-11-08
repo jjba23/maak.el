@@ -5,30 +5,17 @@
 ;; Version: 0.9.3
 ;; Author: Josep Bigorra <jjbigorra@gmail.com>
 ;; Maintainer: Josep Bigorra <jjbigorra@gmail.com>
-;; URL: https://codeberg.org/jjba23/maak.el
+;; URL: https://github.com/jjba23/maak.el
 ;; Keywords: tools
 ;; Package: maak.el
 ;; Package-Requires: ((emacs "28.1"))
 
-;; This file is part of GNU Emacs.
-
-;; GNU Emacs is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; GNU Emacs is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.
+;; SPDX-License-Identifier: MIT
 
 ;;; Commentary:
 
 ;; Maak integration for Emacs.
-;; See https://codeberg.org/jjba23/maak for more info on Maak.
+;; See https://github.com/jjba23/maak for more info on Maak.
 ;;
 ;; A Maak file is a Guile module: every top-level procedure it defines can be a
 ;; task, and an `#:export' list decides which ones are.  This package reads that
