@@ -16,7 +16,7 @@ depends=('emacs')
 makedepends=('emacs')
 checkdepends=('emacs')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha256sums=('286592a3a84d6124aac9df2a4d6fa57edd8f7eece7da770919d9e1b5d695f597')
+sha256sums=('f8be588d83cfff822b529777801983e560180772fcfa44f760ccbc4b84c3e504')
 
 build() {
   cd "$srcdir/maak.el"
