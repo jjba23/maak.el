@@ -6,7 +6,7 @@
 
 # Maintainer: Josep Bigorra <jjbigorra@gmail.com>
 pkgname=emacs-maak
-pkgver=0.9.2
+pkgver=0.9.4
 pkgrel=1
 pkgdesc="Maak integration for Emacs"
 arch=('any')
