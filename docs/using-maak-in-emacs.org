@@ -153,6 +153,11 @@ The task runs through Emacs' ~compile~ machinery, in the project's directory, so
 other build: a Guile backtrace is a jumpable error, and a failing task leaves the
 buffer open beside the file that produced it.
 
+A maak that is not installed is refused before anything runs, with an error that
+names ~maak-executable~ rather than a compilation buffer whose first line says
+~Searching for program~: a missing tool is a configuration mistake, not a build
+failure.
+
 ** What it does not do
 :PROPERTIES:
 :CUSTOM_ID: what-it-does-not-do

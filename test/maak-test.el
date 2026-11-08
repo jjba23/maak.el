@@ -491,7 +491,9 @@ message short enough to read."
                  (lambda (command &rest _)
                    (setq compiled command
                          directory default-directory)
-                   nil)))
+                   nil))
+                ((symbol-function 'executable-find)
+                 (lambda (&rest _) "maak")))
         (maak-run-task "build" '("with space"))
         (should (equal compiled (maak-command "build" '("with space"))))
         (should (equal directory maak-test-project-dir))))))
@@ -605,6 +607,17 @@ The second line, which the completion list has no room for.\"
             (should (looking-at-p "(define (deploy")))
         (when (get-file-buffer maak-test-project-file)
           (kill-buffer (get-file-buffer maak-test-project-file)))))))
+
+(ert-deftest maak-test-run-task-says-when-maak-is-missing ()
+  "A maak that is not installed is a user error that names the setting."
+  (maak-test-with-project
+      "(define-module (maak) #:export (build))
+
+(define (build) \"Build.\" #t)"
+    (cl-letf (((symbol-function 'executable-find) (lambda (&rest _) nil)))
+      (let ((error (should-error (maak-run-task "build" nil) :type 'user-error)))
+        (should (string-match-p "maak-executable"
+                                (error-message-string error)))))))
 
 ;;; This project's own Maak file
 

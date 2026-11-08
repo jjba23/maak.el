@@ -656,6 +656,9 @@ project it belongs to."
   (let ((file (maak-find-file)))
     (unless file
       (user-error "No maak.scm found in this directory or its parents"))
+    (unless (executable-find maak-executable)
+      (user-error "Cannot find the maak executable (%s); install maak or set `maak-executable'"
+                  maak-executable))
     (let ((default-directory (file-name-directory file)))
       (compile (maak-command task arguments)))))
 
