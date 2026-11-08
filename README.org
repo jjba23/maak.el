@@ -4,315 +4,112 @@
 #+language: en
 #+options: toc:nil
 
-[[https://jointhefreeworld.org/ggg/dist/emacs-lisp.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/license-gpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
+[[https://jointhefreeworld.org/ggg/dist/emacs-lisp.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/license-mit.svg]]
 
 #+attr_html: :width 160 :alt maak.el logo
 [[file:logo.svg]]
 
-~maak.el~ brings seamless integration for [[https://codeberg.org/jjba23/maak][Maak: The infinitely extensible command runner, control plane and project automator à la Make (Guile Scheme - Lisp)]] into your Emacs workflow. Maak replaces archaic Makefiles with the elegance and power of GNU Guile Scheme. With ~maak.el~, you can discover, inspect, and execute your Maak tasks directly from the comfort of Emacs, complete with rich minibuffer completions.
+*Your build is Lisp.  Run it like Lisp.*
+
+~maak.el~ is the Emacs front end to [[https://github.com/jjba23/maak][maak]], and both
+are about one freedom: the freedom to write your build in a language you can
+read, change and run without asking a tool for permission.
+
+There is no file format to learn and no plugin API to register against.  A Maak
+file is a Guile module; a task is a lambda.  ~(define (deploy target) ...)~ is
+already a task, with its argument list, its optional and keyword arguments, its
+dotted rest argument and its docstring — nothing to declare twice.
 
 #+begin_quote
-Most build tools invent their own limited domain-specific language.  Maak embraces the powerful *λ Lisp* and the amazing Guile Scheme programming language.
+Most build tools invent their own limited domain-specific language.  Maak
+embraces the powerful *λ Lisp* and the amazing Guile Scheme programming language.
 
-/This also means your code is flexible, robust and reliable (+declarative) for at least the next 50 years./
+/This also means your code is flexible, robust and reliable (+declarative) for at
+least the next 50 years./
 #+end_quote
 
-- Automatic Project Discovery: Automatically locates your root ~maak.scm~ file using dominating-file heuristics.
-- Smart Visibility Parsing: Respects your Maak configuration's ~#:export~ lists—only showing public tasks (or all, if no exports).
-- Polished Completion UI: Implements aligned columns in your preferred completion framework (Vertico, Ivy, Helm, or native ~completing-read~) showcasing task signatures and docstrings.
-- Interactive Argument Gathering: If a task expects parameters, ~maak.el~ will sequentially prompt you for them in the minibuffer before executing, understanding Guile's full lambda list (required, ~#:optional~, ~#:key~, ~#:rest~ and dotted rest arguments).
-- Native Compilation Buffers: Executes tasks asynchronously via Emacs's native ~compile~ system, keeping shell-escaping watertight and allowing you to jump straight to errors.
+Because a task is a lambda and the file is a module, everything a Lisp gives you
+is already there: a task can call another task as a function, a helper is a
+~define~ away, a build step can be redefined in the REPL, and the argument list
+the completion menu shows is the one Guile will enforce.  ~maak.el~ reads that
+file the way maak does, so ~M-x maak-run-task~ offers the tasks a run could
+name, prompts for the arguments they take, and runs them in Emacs' own ~compile~
+buffer — the editor, the build and the language are one Lisp, one keystroke
+apart.
 
 [[https://jointhefreeworld.org/static-assets/maak/maak-in-emacs.png]]
 
-Using standard Emacs properties, your tasks are dynamically formatted in completion list. It will render beautifully aligned columns matching your theme's default font lock faces.
+* What you get
 
-Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseable,  ~maak.el~ parses ~maak.scm~ locally and cleanly, while being aware of S-exps, comments, etc.
+- *Automatic project discovery*: finds your root ~maak.scm~ up the directory
+  tree, from anywhere inside the project.
+- *Smart visibility*: respects the ~#:export~ list, so only the tasks a run could
+  name appear — or all of them, in a file that does not curate its own surface.
+- *Polished completion*: aligned columns in your completion framework of choice
+  (Vertico, Ivy, Helm or plain ~completing-read~), showing each task's arguments
+  and docstring under faces your theme already sets.
+- *Interactive argument gathering*: prompts for what a task needs, in the
+  minibuffer, understanding Guile's whole lambda list — required, ~#:optional~,
+  ~#:key~, ~#:rest~ and dotted rest arguments.
+- *Native compilation buffers*: tasks run asynchronously through Emacs' own
+  ~compile~ system, with shell escaping kept watertight and ~next-error~ working
+  on whatever the task prints.
 
-- It spins up a temporary buffer inside standard Emacs Lisp mode to parse Scheme forms safely.
-- It locates the module's ~#:export~ form (handling comments and strings seamlessly) to build a whitelist.
-- It maps defined procedures matching public exports (or all, if no exports), extracting Scheme docstrings and formal parameter lists.
+* Getting started in one screen
 
-#+begin_src
- ,---.       ,---.
-(     \     /     )
- )  (  \____/  )  (
-(    \ @  @ /    )      [ Maak ]
- )    ( oo )    (       The infinitely extensible
-(      \__/      )      command runner, control plane,
-  `------------'        and project automator.
-#+end_src
+Install maak, put ~maak.el~ on your ~load-path~, bind the command:
 
-If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
-
---------
-
-* Community & Support
-:PROPERTIES:
-:CUSTOM_ID: community-support
-:END:
-
-Join the ~maak~ community to ask questions, discuss development, share configurations, screenshots, report issues, or just hang out:
-
-Issues & development: [[https://codeberg.org/jjba23/maak.el][Codeberg repository]]
-
-Chat, support, discussion, announcements (Zulip): [[https://jointhefreeworld.zulipchat.com/#narrow/channel/632494-maak][Join the maak Zulip community]]
-
-If you're unsure where to start, Zulip is recommended. Codeberg issues is also a good place to add ideas, report bugs or improvements.
-
-------
-
-* Ways to install
-:PROPERTIES:
-:CUSTOM_ID: ways-to-install
-:END:
-
-/Four routes to the same 0.9.2, from the most automated to the most manual.  They all build the tag this README documents./
-
-** From the Guix channel
-:PROPERTIES:
-:CUSTOM_ID: from-the-guix-channel
-:END:
-*GNU Guix* is the functional package manager this project is developed with: a build is a pure function of its inputs, so the same recipe gives the same result everywhere, and an upgrade that goes wrong can be rolled back.
-
-The jointhefreeworld channel carries ~emacs-maak~ at 0.9.2, so a checkout of the channel is enough — no package definition to write:
-
-#+begin_src shell
-git clone https://codeberg.org/jjba23/guix-jointhefreeworld.git
-guix install -L ./guix-jointhefreeworld emacs-maak
-#+end_src
-
-Add the channel to ~$HOME/.config/guix/channels.scm~ (the channel's README has the four lines) and a plain ~guix install emacs-maak~ keeps working on every later ~guix pull~.
-
-** From the Nix flake
-:PROPERTIES:
-:CUSTOM_ID: from-the-nix-flake
-:END:
-*Nix* offers the same declarative, reproducible model with its own language, its own store and a binary cache, and it is a natural fit if the rest of your machine is already described in Nix.
-
-The jointhefreeworld flake builds this project with this repository's own expression, so the package cannot drift from the source:
-
-#+begin_src shell
-nix build github:jjba23/nix-jointhefreeworld#emacs-maak
-#+end_src
-
-The same attribute is available as an overlay, so ~pkgs.jointhefreeworld.emacs-maak~ works inside a NixOS or home-manager configuration too.
-
-** As a container image
-:PROPERTIES:
-:CUSTOM_ID: as-a-container-image
-:END:
-*Podman or Docker* is the route that puts nothing on the host: the ~Dockerfile~ in this repository builds the project in a builder stage and copies only what it installed into a runtime stage, so the image is small and the host keeps its own toolchain untouched.
-
-#+begin_src shell
-podman build -t maak-el .   # docker build -t maak-el . also works
-podman run --rm -it maak-el
-#+end_src
-
-The image's entry point is Emacs, with maak.el installed and byte-compiled, which makes it useful for a quick try and for reproducing a bug on a clean system.
-
-** As a distribution package
-:PROPERTIES:
-:CUSTOM_ID: as-a-distribution-package
-:END:
-*Debian, openSUSE and Arch* each get the project through their own package manager.  Packaging lives in this repository under ~packaging/~ and is pinned to the same release tag, so the recipes and the sources they build are versioned together.
-
-None of the three archives ships maak.el yet, so these are recipes to build rather than packages to install from a mirror:
-
-| Distribution   | Package      | How to build it                                                                     |
-|----------------+--------------+-------------------------------------------------------------------------------------|
-| Debian, Ubuntu | ~elpa-maak~  | copy ~packaging/debian~ to the repository root, then ~dpkg-buildpackage -us -uc -b~ |
-| openSUSE       | ~emacs-maak~ | ~osc build~ with ~packaging/opensuse~                                               |
-| Arch           | ~emacs-maak~ | ~makepkg -si~ in ~packaging/arch~                                                   |
-
-Each recipe carries its own dependency list, so a missing library fails the build with its name rather than producing a package that cannot load.
-
-** Which one?
-:PROPERTIES:
-:CUSTOM_ID: which-one
-:END:
-- *Guix* if you want the toolchain the project is tested with, and the ability to roll back a bad upgrade.
-- *Nix* if the rest of your machine is already declarative; the flake pins nixpkgs and gives you a binary cache.
-- *Container* if you only want to try the release, or reproduce a report on a machine that has nothing installed.
-- *Distribution package* if you want the project managed by the same tool as the rest of your system, with its licence, manual page and launcher in the usual places.
-
-* Installing
-:PROPERTIES:
-:CUSTOM_ID: installing
-:END:
-
-This package is not (yet) available in popular Emacs repositories such as MELPA or ELPA.
-An example installation with Elpaca:
 #+begin_src emacs-lisp
-  (use-package maak.el
-    :ensure (:host codeberg :repo "jjba23/maak.el" :branch "trunk")
-    :demand t
-    :bind ("C-c m r" . maak-run-task))
-  #+end_src
+(use-package maak
+  :ensure (:host github :repo "jjba23/maak.el" :branch "trunk")
+  :bind ("C-c m r" . maak-run-task))
+#+end_src
 
-It is also packaged with Nix. This repository carries the expression itself, ~default.nix~ next to ~maak.el~, so ~nix-build~ in this checkout builds the package; and it is part of [[https://codeberg.org/jjba23/nix-jointhefreeworld][nix-jointhefreeworld]], the set of Nix packages for everything Jointhefreeworld. The set's ~emacsOverlay~ adds it to ~emacsPackages~, byte-compiled and with its autoloads, so an Emacs that Nix builds gets it the way it gets any other package:
-#+begin_src nix
-  let
-    emacsPackages = pkgs.emacsPackages.overrideScope nix-jointhefreeworld.emacsOverlay;
-  in
-    emacsPackages.withPackages (epkgs: [ epkgs.maak ])
-  #+end_src
+Then, from inside any project that has a ~maak.scm~:
 
---------
-
-* Usage
-:PROPERTIES:
-:CUSTOM_ID: usage
-:END:
-
- Running Tasks
-
-Invoke the primary command:
-#+begin_key
+#+begin_src text
 M-x maak-run-task
-#+end_key
-
-- Emacs will search upwards from your current buffer to find a ~maak.scm~.
-- A completion menu will pop up listing all exported tasks from your Scheme configuration.
-- If the task you select defines parameters (e.g., ~(define (deploy server env) ...)~), the minibuffer will prompt you sequentially.
-- Optional arguments can be left out by answering with an empty line; they are then not passed at all, so the task's own default applies.
-- A standard ~*compilation*~ buffer will spawn executing your task via ~maak  <args...>~.
-
-Using standard Emacs properties, your tasks are dynamically formatted in completion list. It will render beautifully aligned columns matching your theme's default font lock faces.
-
---------
-
-* Task arguments
-:PROPERTIES:
-:CUSTOM_ID: task-arguments
-:END:
-
-~maak.el~ reads the argument list of a task the way Guile and maak do, so the prompts and the command line agree with what the task will receive.
-
-| Form in the Maak file                                  | What ~maak.el~ does                                                               |
-|--------------------------------------------------------+-----------------------------------------------------------------------------------|
-| ~(define (deploy target) ...)~                         | Prompts for ~target~. A blank answer is an error, before anything runs.           |
-| ~(define* (deploy target #:optional env) ...)~         | Prompts for ~env~ too; a blank answer leaves it out of the command.               |
-| ~(define* (deploy target #:optional (env "dev")) ...)~ | Shows the default; a blank answer lets the task use it.                           |
-| ~(define* (deploy #:key (env "dev")) ...)~             | Shows ~#:env=dev~ in completion; never prompts, because maak passes only strings. |
-| ~(define (echo . words) ...)~ or ~#:rest words~        | Prompts once for space separated words; a blank answer passes none.               |
-
-An optional argument answered with ~RET~ is *omitted*, never passed as the empty string ~""~ -- that is what makes the default on the task's side work. Leaving out an optional argument also leaves out the arguments after it, because maak binds positional words in order: there is no way to give the third optional argument a value while the second one is empty.
-
-Keyword arguments are displayed with their defaults but are not prompted for. A maak command line passes positional strings, and a string is not a keyword, so a keyword argument always arrives as its default; ~maak kw hello~ is an error, not a way to set a keyword. A keyword argument written without a default cannot be supplied at all, so ~maak.el~ says so before running rather than letting Guile fail with ~Missing keyword~.
-
-#+begin_src scheme
-(define* (deploy target #:optional (env "staging"))
-  "Deploy TARGET to ENV."
-  ...)
 #+end_src
 
-Choosing ~deploy~ and answering ~prod~ then ~RET~ runs:
+The menu lists the project's tasks, the minibuffer asks for what the task you
+picked needs, and the task runs in a ~*compilation*~ buffer.
 
-#+begin_src shell
-maak deploy prod
-#+end_src
+* Documentation
 
-so the task sees ~env = "staging"~, rather than the empty string. An argument that begins with a dash is set apart with ~--~, as in ~maak quick-math -- -23 42~, and every word is shell quoted separately, so spaces and quotes in an argument survive.
+The guide is Org, one page per file under [[file:docs][docs/]], because a project
+whose build is Lisp may as well document itself in something you can read, diff
+and export without a toolchain.  [[file:docs/index.org][The index]] has the full list;
+these are the pages people start with:
 
-* Customization
-:PROPERTIES:
-:CUSTOM_ID: customization
-:END:
-
-You can customize ~maak.el~ behavior and looks with Emacs Lisp config (or via ~M-x customize-group RET maak RET~ ). Some worthy mentions:
-
-| Variable / Face                | Default Value                                    | Description                                                                                 |
-|--------------------------------+--------------------------------------------------+---------------------------------------------------------------------------------------------|
-| ~maak-annotation-padding~      | ~4~                                              | Number of spaces to maintain between the arguments and the docstring in completion columns. |
-| ~maak-executable~              | ~"maak"~                                         | Name of, or path to, the maak executable that tasks run.                                    |
-| ~maak-task-arguments-face~     | Inherits ~font-lock-variable-name-face~ (italic) | Face used to render the task arguments list in completion.                                  |
-| ~maak-task-documentation-face~ | Inherits ~font-lock-doc-face~                    | Face used to render the task docstring in completion.                                       |
-
-Thanks to Lisp being universal, and Scheme and Emacs Lisp being mutually parseable,  ~maak.el~ parses ~maak.scm~ locally and cleanly, while being aware of S-exps, comments, etc.
-
-- It spins up a temporary buffer inside standard Emacs Lisp mode to parse Scheme forms safely.
-- It locates the module's ~#:export~ form (handling comments and strings seamlessly) to build a whitelist.
-- It maps defined procedures matching public exports (or all, if no exports), extracting Scheme docstrings and formal parameter lists.
-
------------
-
-* Development
-:PROPERTIES:
-:CUSTOM_ID: development
-:END:
-
-The project's own ~maak.scm~ defines the checks:
-
-#+begin_src shell
-maak test               # the ERT suite
-maak test optional      # only the tests whose names match "optional"
-maak byte-compile       # byte-compile maak.el with warnings as errors
-maak ci                 # both
-#+end_src
-
-Or run the suite directly:
-
-#+begin_src shell
-emacs -Q --batch -L . -l test/maak-test.el -f ert-run-tests-batch-and-exit
-#+end_src
-
-The fixtures under ~test/fixtures~ cover every argument form. Two tests check the parser against the reference implementation: one asks Guile for the arity of each fixture task, and one asks ~maak --list~ for the task list, so a change in the grammar shows up as a failing test rather than as a stale assumption.
-
-From Lisp, ~maak-get-tasks~ returns one ~(TASK-NAME DOCSTRING ARGUMENTS)~ entry per task, and each argument is a plist with ~:name~, ~:kind~ (~required~, ~optional~, ~key~ or ~rest~) and, when it has one, ~:default~ and ~:default-p~. A keyword argument also carries ~:keyword~.
+| Document                                        | What it covers                                                                            |
+|-------------------------------------------------+-------------------------------------------------------------------------------------------|
+| [[file:docs/installing.org][Installing maak.el]]                    | Guix, Nix, container, distribution package, Elpaca, and which one to pick.                 |
+| [[file:docs/using-maak-in-emacs.org][Running your tasks from Emacs]]         | ~M-x maak-run-task~: finding the file, the completion list, prompting, the compile buffer. |
+| [[file:docs/task-arguments.org][Task arguments]]                       | Every lambda-list form, the defaults, the keyword caveat and the quoting.                  |
+| [[file:docs/customization.org][Customization]]                       | The two variables and two faces.                                                          |
+| [[file:docs/development.org][Development]]                         | The project's own tasks, the suite, the fixtures and the Lisp API.                         |
+| [[file:docs/licensing.org][Licensing]]                           | MIT, and what the releases before this one keep.                                          |
+| [[file:docs/community.org][Community]]                           | Where to ask, the AI policy and the code of conduct.                                       |
+| [[file:docs/colophon.org][Colophon]]                            | The mark, the badges and the text-mode logo.                                              |
 
 * Licensing
-:PROPERTIES:
-:CUSTOM_ID: licensing
-:END:
-Maak and all of its source code are free software, licensed under the GNU General Public License v3 (or newer at your convenience).
 
-https://www.gnu.org/licenses/gpl-3.0.html
+MIT, for the code, the tests, the packaging and this guide alike: use it, change
+it and share it, keeping the copyright and permission notice with every copy.
+[[file:LICENSE][LICENSE]] has the whole text, and
+[[file:docs/licensing.org][Licensing]] explains the change and what it leaves
+behind — releases up to and including 0.9.3 keep the GPL-3.0-or-later terms they
+shipped with.
 
-The documentation and examples, including this document, which are provided with Maak, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
+* Community
 
-https://www.gnu.org/licenses/fdl-1.3.html
+Questions, ideas, screenshots and patches are welcome:
+[[https://github.com/jjba23/maak.el][the repository]] is where development
+happens and [[https://jointhefreeworld.zulipchat.com/#narrow/channel/632494-maak][Zulip]]
+is the quickest place to ask.  The
+[[file:docs/community.org][Community]] page carries the AI policy and the code
+of conduct, and the changes of each release are in [[file:NEWS.org][NEWS.org]].
 
----------
-
-* Colophon
-:PROPERTIES:
-:CUSTOM_ID: colophon
-:END:
-
-- The mascot is the *maak* skeu icon — a skeuomorphic document holding the Guile lambda — and it is the same icon the [[https://codeberg.org/jjba23/maak][maak]] command runner wears, so the two projects read as one family. A copy lives below:
-
-  #+attr_html: :width 200px :alt the maak skeu icon
-  [[file:resources/maak-icon.png]]
-- The logo at the top of this file is the shared maak mark, ~logo.svg~: hand-written 64×64 vector paths, no external assets, no font downloads, so it renders anywhere the file goes. It is the same object maak wears, so the two READMEs read as one family.
-- The badges come from the [[https://jointhefreeworld.org/][jointhefreeworld]] glyph generator.
-- The text-mode logo above is the one maak prints, for terminals and plain-text readers.
-
----------
-
-* AI Policy
-:PROPERTIES:
-:CUSTOM_ID: ai-policy
-:END:
-
-This project adheres to the [[https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-ai-policy/index.html][jointhefreeworld AI (Artificial Intelligence) policy]].
-
-Our core principle is simple: *AI should assist human creativity and problem-solving, never replace human reasoning.*
-
-While tools like Large Language Models (LLMs) and interactive chatbots can be beneficial for reviewing, refactoring small functions, or acting as a sounding board, they should be used with moderation.
-
-We require a human in the loop for all contributions.
-
----------------------
-
-* Code of conduct
-:PROPERTIES:
-:CUSTOM_ID: code-of-conduct
-:END:
-This project adheres to the jointhefreeworld code of conduct. Find it here:
-
-https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-conduct/index.html
-
-In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
-
---------
+If you like my work, please support me by
+[[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue
+with a lot of motivation.

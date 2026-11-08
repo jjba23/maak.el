@@ -1,0 +1,69 @@
+#+title: Customization
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[file:index.org][Documentation index]] · [[file:../README.org][README]]
+
+* Customization
+
+The package keeps its surface small on purpose: one command, two faces and two
+variables.  Everything is reachable from Emacs Lisp or from
+~M-x customize-group RET maak RET~, and nothing needs to be set for it to work.
+
+** Contents
+:PROPERTIES:
+:CUSTOM_ID: contents
+:END:
+
+- [[#variables-and-faces][Variables and faces]]
+- [[#setting-them][Setting them]]
+- [[#making-it-ours][Making it ours]]
+
+** Variables and faces
+:PROPERTIES:
+:CUSTOM_ID: variables-and-faces
+:END:
+
+| Variable / Face                | Default Value                                    | Description                                                                                 |
+|--------------------------------+--------------------------------------------------+---------------------------------------------------------------------------------------------|
+| ~maak-annotation-padding~      | ~4~                                              | Number of spaces to maintain between the arguments and the docstring in completion columns. |
+| ~maak-executable~              | ~"maak"~                                         | Name of, or path to, the maak executable that tasks run.                                    |
+| ~maak-task-arguments-face~     | Inherits ~font-lock-variable-name-face~ (italic) | Face used to render the task arguments list in completion.                                  |
+| ~maak-task-documentation-face~ | Inherits ~font-lock-doc-face~                    | Face used to render the task docstring in completion.                                       |
+
+** Setting them
+:PROPERTIES:
+:CUSTOM_ID: setting-them
+:END:
+
+#+begin_src emacs-lisp
+(use-package maak
+  :custom
+  ;; A maak installed somewhere Emacs' PATH does not reach:
+  (maak-executable "/usr/local/bin/maak")
+  ;; A wider gap between a task's arguments and its docstring:
+  (maak-annotation-padding 6))
+#+end_src
+
+Because both faces inherit from faces your theme already sets, a theme change
+reaches the completion list on its own.  A theme that wants its own colour
+overrides the face directly:
+
+#+begin_src emacs-lisp
+(custom-set-faces
+ '(maak-task-arguments-face ((t :inherit font-lock-variable-name-face :slant normal))))
+#+end_src
+
+** Making it ours
+:PROPERTIES:
+:CUSTOM_ID: making-it-ours
+:END:
+
+The task list is not a table ~maak.el~ owns: it is your Maak file, read the way
+maak reads it.  Renaming a task, adding an argument, changing a docstring or
+changing which procedures are exported is one edit in Guile, and the completion
+follows on the next run.  That is the whole customization story for behaviour;
+the two variables above only change how the list is drawn and which maak is
+called.

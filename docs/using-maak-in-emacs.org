@@ -1,0 +1,116 @@
+#+title: Running your tasks from Emacs
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[file:index.org][Documentation index]] · [[file:../README.org][README]]
+
+* Running your tasks from Emacs
+
+~M-x maak-run-task~ is the whole interface: it finds the project's Maak file,
+lists the tasks a run could name, asks for what the task needs, and runs it in
+Emacs' own compilation buffer.  What a task may ask for is the subject of
+[[file:task-arguments.org][Task arguments]]; this page is the run itself.
+
+** Contents
+:PROPERTIES:
+:CUSTOM_ID: contents
+:END:
+
+- [[#running-a-task][Running a task]]
+- [[#how-the-file-is-found][How the file is found]]
+- [[#what-the-completion-shows][What the completion shows]]
+- [[#prompting][Prompting]]
+- [[#the-compilation-buffer][The compilation buffer]]
+- [[#what-it-does-not-do][What it does not do]]
+
+** Running a task
+:PROPERTIES:
+:CUSTOM_ID: running-a-task
+:END:
+
+#+begin_src text
+M-x maak-run-task
+#+end_src
+
+1. Emacs searches upwards from your current buffer to find a ~maak.scm~.
+2. A completion menu lists every exported task from that file.
+3. If the task you select defines parameters (e.g. ~(define (deploy server env)
+   ...)~), the minibuffer prompts you for them in order.
+4. A ~*compilation*~ buffer runs the task as ~maak <args...>~.
+
+** How the file is found
+:PROPERTIES:
+:CUSTOM_ID: how-the-file-is-found
+:END:
+
+The search walks up from ~default-directory~ to the filesystem root and takes the
+first ~maak.scm~ it meets, so a task run from a file deep inside a project still
+finds the project's own Maak file.  When no file is there at all, the command
+says so instead of running ~maak~ in a directory that has no tasks.
+
+** What the completion shows
+:PROPERTIES:
+:CUSTOM_ID: what-the-completion-shows
+:END:
+
+A Maak file is a Guile module, and an ~#:export~ list decides which procedures
+are tasks.  ~maak.el~ reads that list and the definitions under it, so the menu
+holds the tasks a run could actually name — with no exports, every top-level
+procedure is a task, exactly as in maak — and never a helper the file keeps to
+itself.
+
+Each entry shows the task's name, its arguments and its docstring, in aligned
+columns under the faces your theme already has.  The alignment is what
+~maak-annotation-padding~ sets, and the argument and documentation columns take
+~maak-task-arguments-face~ and ~maak-task-documentation-face~; see
+[[file:customization.org][Customization]].
+
+The parsing is Emacs' own reader doing the work, not a Scheme parser written
+again: the Maak file is opened in a temporary buffer in ~scheme-mode~, syntax
+propertized so that a ~#;~ datum comment really is a comment, and then walked
+with ~forward-sexp~, ~forward-comment~ and friends.  That is why comments,
+strings, block comments, quoted forms, ~define~ and ~define*~ all come out right,
+and why an unbalanced file still yields the tasks read before the mistake instead
+of nothing at all.  Scheme and Emacs Lisp are mutually readable here, which is
+what lets an Emacs hold a conversation with a Guile project without spawning
+Guile for it.
+
+** Prompting
+:PROPERTIES:
+:CUSTOM_ID: prompting
+:END:
+
+Required arguments are asked for, and a blank answer is an error before anything
+runs.  Optional arguments are asked for too, but a blank answer leaves them out
+of the command entirely, so the task's own default applies instead of the empty
+string.  Keyword arguments are shown but never asked for, because a maak command
+line only passes positional strings.
+
+Every word is shell quoted separately, and an argument that begins with a dash is
+set apart with ~--~, so ~maak quick-math -- -23 42~ reaches the task as two
+numbers.  [[file:task-arguments.org][Task arguments]] has the table and the examples.
+
+** The compilation buffer
+:PROPERTIES:
+:CUSTOM_ID: the-compilation-buffer
+:END:
+
+The task runs through Emacs' ~compile~ machinery, in the project's directory, so
+~next-error~, ~recompile~ and the rest of that buffer work as they do for any
+other build: a Guile backtrace is a jumpable error, and a failing task leaves the
+buffer open beside the file that produced it.
+
+** What it does not do
+:PROPERTIES:
+:CUSTOM_ID: what-it-does-not-do
+:END:
+
+- It does not write to your Maak file.  A task is defined in Guile, not in a menu
+  item, so the definition stays where a Lisp can be read, redefined and loaded
+  from the REPL.
+- It does not cache a task list across edits: the file is read when the command
+  runs, so a task you just added is there the next time you ask.
+- It does not interpret the tasks.  ~maak~ runs them, with its own flags and its
+  own environment, and ~maak.el~ only prepares the command line.

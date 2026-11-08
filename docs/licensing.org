@@ -1,0 +1,48 @@
+#+title: Licensing
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[file:index.org][Documentation index]] · [[file:../README.org][README]]
+
+* Licensing
+
+maak.el, its tests, its packaging and its documentation, including every page of
+this guide, are free software under the *MIT license*: use it, change it and share
+it, keeping the copyright notice and the permission notice with every copy.
+
+The whole text is in [[file:../LICENSE][LICENSE]], and every source file says so in
+one line, so a file that travels alone still carries its terms:
+
+#+begin_src text
+SPDX-License-Identifier: MIT
+#+end_src
+
+** What that means in practice
+:PROPERTIES:
+:CUSTOM_ID: what-that-means-in-practice
+:END:
+
+- *You can use it anywhere.*  MIT is compatible with the licenses of the other
+  Emacs packages you may be running it beside, and with the ones you may want to
+  put around it — proprietary included.  Nothing here asks you to publish your
+  own Maak files or your own Emacs configuration.
+- *You keep your copies free.*  There is no warranty: a build is your build, and
+  a task that removes a directory removes it.
+- *Attribution is the one condition.*  Keep the copyright line and the permission
+  notice; that is the whole of it.
+
+A dependency is a licensing decision too, so this project takes one that is
+needed, MIT compatible and pinned.
+
+** Before 0.9.4
+:PROPERTIES:
+:CUSTOM_ID: before-0-9-4
+:END:
+
+Releases up to and including 0.9.3 shipped under the *GNU General Public License
+v3 or newer* for the code and the *GNU Free Documentation License v1.3 or newer*
+for the documentation.  Those releases keep those terms; this repository, and
+everything after them, is MIT.  The change is recorded in the
+[[file:../NEWS.org][release notes]].

@@ -1,0 +1,33 @@
+#+title: maak.el documentation
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[file:../README.org][← Project README]]
+
+* maak.el documentation
+
+~maak.el~ is the Emacs front end to [[https://github.com/jjba23/maak][maak]], and both
+are about one freedom: your build is Lisp you can read, change and run.  A Maak
+file is a Guile module, a task is a lambda, and ~maak.el~ puts those lambdas one
+~M-x~ away.  The guide is split by topic; each page links onward where a topic
+continues.
+
+| Document                                        | What it covers                                                                            |
+|-------------------------------------------------+-------------------------------------------------------------------------------------------|
+| [[file:installing.org][Installing maak.el]]                    | The four routes to the same release, the requirements, and which one to pick.              |
+| [[file:using-maak-in-emacs.org][Running your tasks from Emacs]]         | ~M-x maak-run-task~: finding the file, the completion list, prompting and the compile buffer. |
+| [[file:task-arguments.org][Task arguments]]                       | Every lambda-list form, the defaults, the keyword caveat and the quoting.                  |
+| [[file:customization.org][Customization]]                       | The two variables and two faces, and what is meant to stay in your Maak file.              |
+| [[file:development.org][Development]]                         | The task list, the suite, the fixtures and the Lisp API behind the command.                |
+| [[file:licensing.org][Licensing]]                           | MIT, what it replaced, and what the releases before this one keep.                          |
+| [[file:community.org][Community]]                           | Where to ask, the AI policy and the code of conduct.                                       |
+| [[file:colophon.org][Colophon]]                            | The mark, the badges and the text-mode logo.                                              |
+
+Start with [[file:installing.org][Installing maak.el]] if the package is not on your
+machine yet, and with
+[[file:using-maak-in-emacs.org][Running your tasks from Emacs]] if it is.  When a prompt
+asks something you did not expect, the answer is in
+[[file:task-arguments.org][Task arguments]]: it is the page that explains why an
+optional argument answered with ~RET~ is omitted rather than passed empty.

@@ -1,0 +1,89 @@
+#+title: Task arguments
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[file:index.org][Documentation index]] · [[file:../README.org][README]]
+
+* Task arguments
+
+A task's arguments are a Guile lambda list, because a task is a lambda.  ~maak.el~
+reads that list the way Guile and maak do, so the prompts and the command line
+agree with what the task will actually receive — including the parts of a lambda
+list a build tool's own syntax would have to leave out.
+
+** Contents
+:PROPERTIES:
+:CUSTOM_ID: contents
+:END:
+
+- [[#what-each-form-does][What each form does]]
+- [[#defaults-and-blank-answers][Defaults and blank answers]]
+- [[#keyword-arguments-are-shown-not-passed][Keyword arguments are shown, not passed]]
+- [[#a-worked-example][A worked example]]
+- [[#quoting][Quoting]]
+
+** What each form does
+:PROPERTIES:
+:CUSTOM_ID: what-each-form-does
+:END:
+
+| Form in the Maak file                                  | What ~maak.el~ does                                                               |
+|--------------------------------------------------------+-----------------------------------------------------------------------------------|
+| ~(define (deploy target) ...)~                         | Prompts for ~target~. A blank answer is an error, before anything runs.           |
+| ~(define* (deploy target #:optional env) ...)~         | Prompts for ~env~ too; a blank answer leaves it out of the command.               |
+| ~(define* (deploy target #:optional (env "dev")) ...)~ | Shows the default; a blank answer lets the task use it.                           |
+| ~(define* (deploy #:key (env "dev")) ...)~             | Shows ~#:env=dev~ in completion; never prompts, because maak passes only strings. |
+| ~(define (echo . words) ...)~ or ~#:rest words~        | Prompts once for space separated words; a blank answer passes none.               |
+
+** Defaults and blank answers
+:PROPERTIES:
+:CUSTOM_ID: defaults-and-blank-answers
+:END:
+
+An optional argument answered with ~RET~ is *omitted*, never passed as the empty
+string ~""~ — that is what makes the default on the task's side work.  Leaving out
+an optional argument also leaves out the arguments after it, because maak binds
+positional words in order: there is no way to give the third optional argument a
+value while the second one is empty.
+
+** Keyword arguments are shown, not passed
+:PROPERTIES:
+:CUSTOM_ID: keyword-arguments-are-shown-not-passed
+:END:
+
+Keyword arguments are displayed with their defaults but are not prompted for.  A
+maak command line passes positional strings, and a string is not a keyword, so a
+keyword argument always arrives as its default; ~maak kw hello~ is an error, not a
+way to set a keyword.  A keyword argument written without a default cannot be
+supplied at all, so ~maak.el~ says so before running rather than letting Guile
+fail with ~Missing keyword~.
+
+** A worked example
+:PROPERTIES:
+:CUSTOM_ID: a-worked-example
+:END:
+
+#+begin_src scheme
+(define* (deploy target #:optional (env "staging"))
+  "Deploy TARGET to ENV."
+  ...)
+#+end_src
+
+Choosing ~deploy~ and answering ~prod~ then ~RET~ runs:
+
+#+begin_src shell
+maak deploy prod
+#+end_src
+
+so the task sees ~env = "staging"~, rather than the empty string.
+
+** Quoting
+:PROPERTIES:
+:CUSTOM_ID: quoting
+:END:
+
+An argument that begins with a dash is set apart with ~--~, as in
+~maak quick-math -- -23 42~, and every word is shell quoted separately, so spaces
+and quotes in an argument survive the trip to the task.

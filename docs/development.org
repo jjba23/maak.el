@@ -1,0 +1,112 @@
+#+title: Development
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[file:index.org][Documentation index]] · [[file:../README.org][README]]
+
+* Development
+
+The project's own ~maak.scm~ defines the checks, which is the point of the whole
+thing: a repository whose build is a Lisp file you can read is a repository whose
+build you can also run from the editor that reads it.
+
+** Contents
+:PROPERTIES:
+:CUSTOM_ID: contents
+:END:
+
+- [[#the-checks][The checks]]
+- [[#the-suite][The suite]]
+- [[#the-fixtures][The fixtures]]
+- [[#the-lisp-api][The Lisp API]]
+- [[#continuous-integration][Continuous integration]]
+
+** The checks
+:PROPERTIES:
+:CUSTOM_ID: the-checks
+:END:
+
+#+begin_src shell
+maak test               # the ERT suite
+maak test optional      # only the tests whose names match "optional"
+maak byte-compile       # byte-compile maak.el with warnings as errors
+maak ci                 # both
+#+end_src
+
+~maak agents~ regenerates ~AGENTS.md~ from the skills pinned in ~maak.scm~, and
+the container tasks (~container-build~, ~container-run~, ~package-docker~) are
+there for the image described in
+[[file:installing.org::#as-a-container-image][Installing]].
+
+** The suite
+:PROPERTIES:
+:CUSTOM_ID: the-suite
+:END:
+
+Without maak, the suite is one Emacs run:
+
+#+begin_src shell
+emacs -Q --batch -L . -l test/maak-test.el -f ert-run-tests-batch-and-exit
+#+end_src
+
+The tests are about the two halves of the package: reading a Maak file the way
+maak reads it, and turning what was read into a command.  They need no network
+and no Guile; when Guile or maak happen to be installed, two more tests compare
+~maak.el~'s reading with the reference implementation instead of skipping.
+
+** The fixtures
+:PROPERTIES:
+:CUSTOM_ID: the-fixtures
+:END:
+
+~test/fixtures/grammar.scm~ holds every argument form Guile accepts, one exported
+task per shape, plus the definitions that must *not* become tasks — a helper
+defined inside a task body, a value definition, and names hidden by comments of
+each kind.  One test asks Guile itself for the arity of each task and compares it
+with what ~maak.el~ read, so a change in the grammar shows up as a failing test
+rather than as a stale assumption; another asks ~maak --list~ for the task list
+for the same reason.
+
+~test/fixtures/open.scm~ is the other half of the rule: no ~#:export~ at all, so
+every top-level procedure is a task, which is what maak does with a file that
+does not curate its own surface.
+
+** The Lisp API
+:PROPERTIES:
+:CUSTOM_ID: the-lisp-api
+:END:
+
+The command is a thin layer over two functions, and they are what to reach for
+from your own Lisp:
+
+- ~maak-find-file~ returns the nearest ~maak.scm~ above ~default-directory~, or
+  nil.
+- ~maak-get-tasks~ takes a file and returns one ~(TASK-NAME DOCSTRING
+  ARGUMENTS)~ entry per task.
+
+Each element of ~ARGUMENTS~ is a plist with ~:name~, ~:kind~ (one of ~required~,
+~optional~, ~key~ or ~rest~) and, when it has one, ~:default~ and ~:default-p~.  A
+keyword argument also carries ~:keyword~.
+
+#+begin_src emacs-lisp
+(mapcar (lambda (task)
+          (list (nth 0 task) (length (nth 2 task))))
+        (maak-get-tasks (maak-find-file)))
+#+end_src
+
+** Continuous integration
+:PROPERTIES:
+:CUSTOM_ID: continuous-integration
+:END:
+
+~.github/workflows/ci.yml~ is the same gate without maak installed: the suite on
+every Emacs version the package claims — 28.2, 29.4 and 30.1 — and a lint job on
+the newest that byte-compiles with warnings turned into errors.  A warning only
+an old byte-compiler emits is not a compatibility failure, which is why the two
+are separate jobs.
+
+~.github/workflows/release.yml~ runs the suite from the tagged commit and attaches
+that commit's archive to the GitHub release, so nothing is published from a tree
+whose tests did not pass.
